@@ -4,6 +4,7 @@
  * find returns a set's root with path compression. unite returns true when sets merge.
  */
 
+#include <algorithm>
 #include <cstddef>
 #include <numeric>
 #include <vector>
