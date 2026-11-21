@@ -38,3 +38,71 @@ jobs:
         run: cargo test --locked
       - name: Run Clippy
         run: cargo clippy --locked --all-targets -- -D warnings
+
+  benchmarks:
+    name: Benchmark C++23 and Rust
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [cpp, rust]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install benchmark tools
+        run: |
+          rustup toolchain install stable --profile minimal
+          python -m pip install -r benchmarks/requirements.txt
+      - name: Measure small, medium, and large workloads
+        run: |
+          python benchmarks/compare.py --cxx g++-14 --output "$RUNNER_TEMP/benchmark-results"
+          cat "$RUNNER_TEMP/benchmark-results/README.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: benchmark-results
+          path: ${{ runner.temp }}/benchmark-results
+          if-no-files-found: error
+
+  publish-benchmarks:
+    name: Publish README benchmarks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: benchmarks
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    concurrency:
+      group: publish-benchmark-results
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: benchmark-results
+          path: ${{ runner.temp }}/benchmark-results
+      - name: Update the generated results branch
+        shell: bash
+        run: |
+          main_tip=$(git ls-remote origin refs/heads/main)
+          if [[ "${main_tip%%$'\t'*}" != "$GITHUB_SHA" ]]; then
+            printf '%s\n' 'A newer revision is on main. Skipping publication.'
+            exit 0
+          fi
+          results_tip=$(git ls-remote origin refs/heads/benchmark-results)
+          if [[ -n "$results_tip" ]]; then
+            git fetch --depth=1 origin refs/heads/benchmark-results
+            git switch --detach FETCH_HEAD
+          else
+            git switch --orphan benchmark-results
+          fi
+
+          cp "$RUNNER_TEMP/benchmark-results/"{README.md,results.json,comparison*.svg} .
+          git add -- README.md results.json comparison*.svg
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -m "Publish benchmarks for ${GITHUB_SHA:0:7}"
+          git push origin HEAD:refs/heads/benchmark-results

@@ -172,6 +172,40 @@ Rust string-matching templates take byte slices such as `b"ababa"` and report by
 
 ---
 
+## Benchmarks
+
+Six C++23 and Rust templates run on the same GitHub-hosted runner at **small, medium, and large** input sizes. The largest workloads scan over 8 million values or bytes, or run over a million data-structure operations. Each case uses 12 timed pairs with matching inputs and verified checksums.
+
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brucerry/dsa-template/benchmark-results/comparison-mobile-dark.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brucerry/dsa-template/benchmark-results/comparison-dark.svg">
+  <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/brucerry/dsa-template/benchmark-results/comparison-mobile.svg">
+  <img src="https://raw.githubusercontent.com/brucerry/dsa-template/benchmark-results/comparison.svg" alt="Median C++23 and Rust runtimes for six algorithms at three input sizes. A results table is linked below." width="100%">
+</picture>
+
+[Results and methodology](https://github.com/brucerry/dsa-template/tree/benchmark-results) · [Raw samples](https://raw.githubusercontent.com/brucerry/dsa-template/benchmark-results/results.json) · [Static chart](https://raw.githubusercontent.com/brucerry/dsa-template/benchmark-results/comparison-static.svg)
+
+CI refreshes these results after a passing benchmark run on `main`.
+
+The chart compares these template implementations. Compiler choices, algorithms, data layouts, and runner load can affect the timings.
+
+<details>
+<summary>Run the benchmarks locally</summary>
+
+Use Python 3.11 or newer and the C++23 and Rust toolchains below.
+
+```sh
+python3 -m venv /tmp/dsa-benchmark-env
+/tmp/dsa-benchmark-env/bin/python -m pip install -r benchmarks/requirements.txt
+/tmp/dsa-benchmark-env/bin/python benchmarks/compare.py --output /tmp/dsa-benchmarks
+```
+
+Use `--cxx g++-14` to select GCC or `--tiers small` for a quicker run.
+
+</details>
+
+---
+
 ## Build and test
 
 <details>

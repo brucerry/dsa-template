@@ -1,2 +1,3 @@
 .vscode/
 /target/
+/benchmarks/__pycache__/
