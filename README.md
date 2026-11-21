@@ -1,61 +1,20 @@
-# DSA Template
+<h1 align="center">DSA Template</h1>
 
-Classic data structures and algorithms in **C++23** and **Rust 2024**. Each template has a `.cc` and a `.rs` file with the same name in [`templates/`](templates/).
+<p align="center">
+  <a href="https://github.com/brucerry/DSA-Template/actions/workflows/ci.yml"><img src="https://github.com/brucerry/DSA-Template/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status on main"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
+</p>
 
-[Try an example](#try-an-example) · [Browse templates](#browse-templates) · [Build and test](#build-and-test)
+<p align="center">Classic data structures and algorithms.</p>
 
-## Try an example
-
-Open either language to try Kadane's algorithm, or open both to compare. The maximum subarray is `[4, -1, 2, 1]`, with sum `6`.
-
-<details>
-<summary>C++23 example</summary>
-
-Save as `example.cc` in the repository root.
-
-```cpp
-#include <cassert>
-#include "templates/arrays/kadane.cc"
-
-int main() {
-    std::vector<int> numbers{-2, 1, -3, 4, -1, 2, 1, -5, 4};
-    assert(kadane(numbers) == 6);
-}
-```
-
-```sh
-c++ -std=c++23 example.cc -o /tmp/dsa-example && /tmp/dsa-example
-```
-
-</details>
-
-<details>
-<summary>Rust example</summary>
-
-Save as `example.rs` in the repository root.
-
-```rust
-#[path = "templates/arrays/kadane.rs"]
-mod kadane;
-
-fn main() {
-    let numbers = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
-    assert_eq!(kadane::kadane(&numbers), Some(6));
-}
-```
-
-```sh
-rustc --edition=2024 example.rs -o /tmp/dsa-example && /tmp/dsa-example
-```
-
-</details>
+---
 
 ## Browse templates
 
-Expand a category and choose **C++23** or **Rust** for the same algorithm.
+### Arrays
 
 <details open>
-<summary>Arrays</summary>
+<summary>Array source files</summary>
 
 | Template | C++23 | Rust |
 | --- | --- | --- |
@@ -63,8 +22,10 @@ Expand a category and choose **C++23** or **Rust** for the same algorithm.
 
 </details>
 
-<details>
-<summary>Graphs</summary>
+### Graphs
+
+<details open>
+<summary>Graph source files</summary>
 
 | Template | C++23 | Rust |
 | --- | --- | --- |
@@ -72,8 +33,10 @@ Expand a category and choose **C++23** or **Rust** for the same algorithm.
 
 </details>
 
-<details>
-<summary>Linked lists</summary>
+### Linked lists
+
+<details open>
+<summary>Linked-list source files</summary>
 
 | Template | C++23 | Rust |
 | --- | --- | --- |
@@ -81,8 +44,10 @@ Expand a category and choose **C++23** or **Rust** for the same algorithm.
 
 </details>
 
-<details>
-<summary>Maths</summary>
+### Maths
+
+<details open>
+<summary>Maths source files</summary>
 
 | Template | C++23 | Rust |
 | --- | --- | --- |
@@ -93,8 +58,10 @@ Expand a category and choose **C++23** or **Rust** for the same algorithm.
 
 </details>
 
-<details>
-<summary>Strings</summary>
+### Strings
+
+<details open>
+<summary>String source files</summary>
 
 | Template | C++23 | Rust |
 | --- | --- | --- |
@@ -107,8 +74,10 @@ Rust string-matching templates take byte slices such as `b"ababa"` and report by
 
 </details>
 
-<details>
-<summary>Trees</summary>
+### Trees
+
+<details open>
+<summary>Tree source files</summary>
 
 | Template | C++23 | Rust |
 | --- | --- | --- |
@@ -120,6 +89,8 @@ Rust string-matching templates take byte slices such as `b"ababa"` and report by
 | Binary trie (minimum XOR) | [C++23](templates/trees/trie_binary.cc) | [Rust](templates/trees/trie_binary.rs) |
 
 </details>
+
+---
 
 ## Build and test
 
@@ -152,5 +123,3 @@ rustc --edition=2024 --crate-type lib templates/arrays/kadane.rs -o /tmp/libkada
 ```
 
 </details>
-
-[MIT License](LICENSE)
