@@ -1,0 +1,8 @@
+[package]
+name = "dsa-template"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+path = "templates/lib.rs"
