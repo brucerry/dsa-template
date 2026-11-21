@@ -1,18 +1,20 @@
 /*
-    Building the Prime Sieve
-*/
+ * The Sieve of Eratosthenes marks primes from 0 through n, inclusive.
+ * Use n >= 1. The result stores 1 for primes and 0 for all other entries.
+ */
 
-#include <bits/stdc++.h>
-using namespace std;
+#include <cstddef>
+#include <vector>
 
-#define LARGEST_NUMBER ((int)1e9)
+constexpr int LARGEST_NUMBER = 1e9;
 
-vector<int> build_sieve(int n = LARGEST_NUMBER) {
-    vector<int> isprime (n + 1, true);
+std::vector<int> build_sieve(int n = LARGEST_NUMBER) {
+    std::size_t limit = static_cast<std::size_t>(n);
+    std::vector<int> isprime(limit + 1, true);
     isprime[0] = isprime[1] = false;
-    for (int f = 2; f * f <= n; f++) {
+    for (std::size_t f = 2; f * f <= limit; ++f) {
         if (isprime[f]) {
-            for (int x = f * f; x <= n; x += f) {
+            for (std::size_t x = f * f; x <= limit; x += f) {
                 isprime[x] = false;
             }
         }

@@ -1,42 +1,47 @@
 /*
-    This code source:
-    https://github.com/ncduy0303/Competitive-Programming/blob/master/String%20Processing/Z-algo%20(Z%20function).cpp
-*/
+ * The Z-function counts occurrences of a nonempty pattern in linear time.
+ * Keep the separator '#' out of both the text and the pattern.
+ * z_func gives the matching prefix length at each position and sets the first entry to 0.
+ *
+ * Adapted from https://github.com/ncduy0303/Competitive-Programming/blob/master/String%20Processing/Z-algo%20(Z%20function).cpp
+ * Example problem at https://cses.fi/problemset/task/1753/
+ */
 
-// Given a string s (with length n) and a pattern p (with length m), find all the occurrence of p in s
-// Time complexity: O(n + m)
-// Problem link: https://cses.fi/problemset/task/1753/
-
-#include <bits/stdc++.h>
-using namespace std;
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
+#include <ranges>
+#include <string>
+#include <string_view>
+#include <vector>
  
-// f[i] = length of the longest common prefix between s and the substring s[i...n-1]
-vector<int> z_func(string& s) {
-    int n = s.size();
-    vector<int> f (n); // f[0] = 0 by default
-    for (int i = 1, l = 0, r = 0; i < n; i++) {
+std::vector<int> z_func(std::string& s) {
+    std::size_t n = std::size(s);
+    std::vector<int> f(n);
+    std::size_t l = 0, r = 0;
+    for (std::size_t i : std::views::iota(std::size_t{0}, n) | std::views::drop(1)) {
+        std::size_t match = 0;
         if (i <= r)
-            f[i] = min(r - i + 1, f[i - l]);
-        while (i + f[i] < n && s[f[i]] == s[i + f[i]]) {
-            f[i]++;
+            match = std::min(r - i + 1, static_cast<std::size_t>(f[i - l]));
+        while (i + match < n and s[match] == s[i + match]) {
+            ++match;
         }
-        if (i + f[i] - 1 > r) {
+        f[i] = static_cast<int>(match);
+        if (std::size_t end = i + match - 1; end > r) {
             l = i;
-            r = i + f[i] - 1;
+            r = end;
         }
     }
     return f;
 }
  
-int count_occurs(string s, string pattern) {
-    string ps = pattern + "#" + s;
-    int n = pattern.size();
-    int m = s.size();
-    int nm = ps.size();
-    vector<int> f = z_func(ps);
-    int res = 0;
-    for (int i = n + 1; i < nm; i++) {
-        res += f[i] == n;
-    }
-    return res;
+int count_occurs(std::string_view s, std::string_view pattern) {
+    std::string ps;
+    ps.reserve(std::size(pattern) + 1 + std::size(s));
+    ps += pattern;
+    ps += '#';
+    ps += s;
+    std::ptrdiff_t n = std::ssize(pattern);
+    std::vector<int> f = z_func(ps);
+    return static_cast<int>(std::ranges::count(f | std::views::drop(n + 1), n));
 }

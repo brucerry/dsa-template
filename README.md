@@ -4,6 +4,8 @@
 
 Collecting code templates of classic Data Structures &amp; Algorithms solutions.
 
+Compile the templates with `-std=c++23`. The segment tree examples require a standard library that provides `<print>`.
+
 ## Array
 - [Kadane's algorithm](https://github.com/brucerry/DSA-Template/blob/main/Arrays/kadane.cc)
 

@@ -1,16 +1,19 @@
 /*
-    Union Find / Disjoint Union Set (DSU)
-*/
+ * Union-Find tracks disjoint sets of elements numbered 0 through n - 1.
+ * Each element starts in its own set, and group counts the remaining sets.
+ * find returns a set's root with path compression. unite returns true when sets merge.
+ */
 
-#include <bits/stdc++.h>
-using namespace std;
+#include <cstddef>
+#include <numeric>
+#include <vector>
 
 struct UnionFind {
     int group;
-    vector<int> parent;
+    std::vector<int> parent;
 
-    UnionFind(int n) : group (n), parent (n) {
-        iota(parent.begin(), parent.end(), 0);
+    UnionFind(int n) : group(n), parent(static_cast<std::size_t>(n)) {
+        std::ranges::iota(parent, 0);
     }
 
     bool unite(int node1, int node2) {
@@ -18,12 +21,13 @@ struct UnionFind {
         int par2 = find(node2);
         if (par1 == par2)
             return false;
-        parent[par1] = par2;
+        parent[static_cast<std::size_t>(par1)] = par2;
         --group;
         return true;
     }
 
     int find(int node) {
-        return parent[node] == node ? node : parent[node] = find(parent[node]);
+        int& next = parent[static_cast<std::size_t>(node)];
+        return next == node ? node : next = find(next);
     }
 };

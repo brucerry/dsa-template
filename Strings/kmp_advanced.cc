@@ -1,36 +1,31 @@
-#include <bits/stdc++.h>
-using namespace std;
-
 /*
-    KMP - Knuth–Morris–Pratt algorithm
+ * Knuth–Morris–Pratt finds all occurrences of sub in s, including overlaps.
+ * Returns zero-based start indices in ascending order.
+ * Use a nonempty pattern and keep the separator '#' out of both inputs.
+ * Time and space are linear in the combined length of the text and pattern.
+ */
 
-    Parameters:
-        - s: The target string
-        - sub: The target substring
+#include <cstddef>
+#include <iterator>
+#include <ranges>
+#include <string>
+#include <vector>
 
-    Returns:
-        A vector which contains all indices (in ascending order) of 's' where the 'sub' is a substring of 's' to start at
-
-    Time:
-        O(s + sub)
-
-    Space:
-        O(s + sub)
-*/
-vector<int> kmp(string& s, string& sub) {
-    string tmp = sub + '#' + s;
-    vector<int> dp (tmp.size());
-    for (int i = 1; i < tmp.size(); i++) {
-        int cur = dp[i - 1];
+std::vector<int> kmp(std::string& s, std::string& sub) {
+    std::string tmp = sub + '#' + s;
+    std::vector<int> dp(std::size(tmp));
+    for (std::size_t i : std::views::iota(std::size_t{1}, std::size(tmp))) {
+        std::size_t cur = static_cast<std::size_t>(dp[i - 1]);
         while (cur and tmp[i] != tmp[cur]) {
-            cur = dp[cur - 1];
+            cur = static_cast<std::size_t>(dp[cur - 1]);
         }
-        dp[i] = cur + (tmp[i] == tmp[cur]);
+        dp[i] = static_cast<int>(cur + (tmp[i] == tmp[cur]));
     }
-    vector<int> k;
-    for (int i = 0; i < dp.size(); i++) {
-        if (dp[i] >= sub.size()) {
-            k.emplace_back(i - 2 * sub.size());
+    std::vector<int> k;
+    std::ptrdiff_t pattern_length = std::ssize(sub);
+    for (auto [i, match_length] : std::views::zip(std::views::iota(std::ptrdiff_t{0}), dp)) {
+        if (match_length >= pattern_length) {
+            k.push_back(static_cast<int>(i - 2 * pattern_length));
         }
     }
     return k;

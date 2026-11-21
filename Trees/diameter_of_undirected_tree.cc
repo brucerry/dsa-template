@@ -1,40 +1,45 @@
-#include <bits/stdc++.h>
-using namespace std;
-
 /*
- * Undirected tree
- *
- * Number of nodes n = size of edges + 1
- * Nodes are numbered from 0 to n - 1
- * edges[i] = [a, b] where node 'a' and node 'b' are connected with an edge
+ * Finds the longest path in an undirected tree, measured in edges.
+ * Each edge contains two endpoints. With n - 1 edges, nodes are numbered 0 through n - 1.
  */
-int diameter(vector<vector<int>>& edges) {
-    int n = edges.size() + 1;
-    vector<vector<int>> al (n);
-    vector<int> cnt (n);
+
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
+#include <queue>
+#include <ranges>
+#include <vector>
+
+int diameter(std::vector<std::vector<int>>& edges) {
+    std::size_t n = std::size(edges) + 1;
+    std::vector<std::vector<int>> al(n);
+    std::vector<int> cnt(n);
     for (auto& e : edges) {
-        al[e[0]].push_back(e[1]);
-        al[e[1]].push_back(e[0]);
-        ++cnt[e[0]];
-        ++cnt[e[1]];
+        std::size_t a = static_cast<std::size_t>(e[0]);
+        std::size_t b = static_cast<std::size_t>(e[1]);
+        al[a].push_back(e[1]);
+        al[b].push_back(e[0]);
+        ++cnt[a];
+        ++cnt[b];
     }
-    queue<int> que;
-    for (int i = 0; i < n; ++i) {
+    std::queue<std::size_t> que;
+    for (std::size_t i : std::views::iota(std::size_t{0}, n)) {
         if (cnt[i] == 1)
             que.push(i);
     }
-    vector<int> depth (n), seen (n);
+    std::vector<int> depth(n), seen(n);
     int res = 0;
-    while (que.size()) {
-        int cur = que.front();
+    while (!que.empty()) {
+        std::size_t cur = que.front();
         que.pop();
         seen[cur] = 1;
-        for (int next : al[cur]) {
+        for (int neighbor : al[cur]) {
+            std::size_t next = static_cast<std::size_t>(neighbor);
             if (--cnt[next] == 1)
                 que.push(next);
             if (!seen[next]) {
-                res = max(res, depth[cur] + depth[next] + 1);
-                depth[next] = max(depth[next], depth[cur] + 1);
+                res = std::max(res, depth[cur] + depth[next] + 1);
+                depth[next] = std::max(depth[next], depth[cur] + 1);
             }
         }
     }

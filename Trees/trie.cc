@@ -1,20 +1,17 @@
 /*
-    Trie - prefix tree
-    Implementing with lower-case letters
-*/
+ * A trie stores words containing lowercase letters a through z.
+ * Words with a common prefix share the same path from the root.
+ */
 
-#include <bits/stdc++.h>
-using namespace std;
+#include <string_view>
 
 struct Trie {
     Trie* children[26] = {};
     bool is_end = false;
 
-    Trie() {
-        
-    }
+    Trie() = default;
 
-    void insert(string word) {
+    void insert(std::string_view word) {
         Trie* cur = this;
         for (char c : word) {
             if (!cur->children[c - 'a'])
@@ -24,7 +21,7 @@ struct Trie {
         cur->is_end = true;
     }
 
-    Trie* search_prefix(string prefix) {
+    Trie* search_prefix(std::string_view prefix) {
         Trie* cur = this;
         for (char c : prefix) {
             if (!cur->children[c - 'a'])
@@ -34,7 +31,7 @@ struct Trie {
         return cur;
     }
 
-    bool search(string word) {
+    bool search(std::string_view word) {
         Trie* res = search_prefix(word);
         return res and res->is_end;
     }

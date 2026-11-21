@@ -1,9 +1,9 @@
 /*
-    pow(x, n) in O(logn) time
-*/
+ * Binary exponentiation computes x raised to n in logarithmic time.
+ * The absolute value of n must fit in int. Use a nonzero base for a negative exponent.
+ */
 
-#include <bits/stdc++.h>
-using namespace std;
+#include <cstdlib>
 
 double solve(double x, int n) {
     if (n == 0)
@@ -17,7 +17,7 @@ double solve(double x, int n) {
 }
 
 double pow(double x, int n) {
-    double res = solve(x, abs(n));
+    double res = solve(x, std::abs(n));
     return n < 0 ? 1 / res : res;
 }
   

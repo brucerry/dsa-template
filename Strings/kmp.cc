@@ -1,44 +1,44 @@
 /*
-    KMP - Knuth–Morris–Pratt algorithm
-    Implement strstr(a, b): return the first index where 'b' is a substring of 'a' to start at
-*/
+ * Knuth–Morris–Pratt finds the first occurrence of needle in haystack.
+ * strStr returns a zero-based index, -1 for no match, or 0 for an empty needle.
+ * When calling kmp directly, pass a zero-filled table with one entry per needle character.
+ */
 
-#include <bits/stdc++.h>
-using namespace std;
+#include <cstddef>
+#include <iterator>
+#include <ranges>
+#include <string_view>
+#include <vector>
 
-void kmp(string& needle, vector<int>& preproc) {
-    int l = 0, r = 1;
-    while (r < needle.size()) {
+void kmp(std::string_view needle, std::vector<int>& preproc) {
+    std::size_t l = 0;
+    for (std::size_t r : std::views::iota(std::size_t{0}, std::size(needle)) | std::views::drop(1)) {
+        while (l and needle[l] != needle[r]) {
+            l = static_cast<std::size_t>(preproc[l - 1]);
+        }
         if (needle[l] == needle[r]) {
-            preproc[r] = l + 1;
-            l++, r++;
-        }
-        else if (l) {
-            l = preproc[l-1];
-        }
-        else {
-            r++;
+            preproc[r] = static_cast<int>(++l);
         }
     }
 }
 
-int strStr(string haystack, string needle) {
-    int m = haystack.size();
-    int n = needle.size();
-    vector<int> preproc (n);
+int strStr(std::string_view haystack, std::string_view needle) {
+    std::size_t n = std::size(needle);
+    if (!n) {
+        return 0;
+    }
+
+    std::vector<int> preproc(n);
     kmp(needle, preproc);
 
-    int i = 0, j = 0;
-    while (i < m and j < n) {
-        if (haystack[i] == needle[j]) {
-            i++, j++;
+    std::size_t j = 0;
+    for (std::size_t i : std::views::iota(std::size_t{0}, std::size(haystack))) {
+        while (j and haystack[i] != needle[j]) {
+            j = static_cast<std::size_t>(preproc[j - 1]);
         }
-        else if (j) {
-            j = preproc[j-1];
-        }
-        else {
-            i++;
+        if (haystack[i] == needle[j] and ++j == n) {
+            return static_cast<int>(i + 1 - n);
         }
     }
-    return j == n ? i - j : -1;
+    return -1;
 }

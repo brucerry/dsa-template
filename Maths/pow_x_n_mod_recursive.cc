@@ -1,15 +1,13 @@
 /*
-    Recursive version
-    pow(x, n, mod) in O(logn) time
-    Take mod during the process
-*/
+ * Recursive binary exponentiation halves the exponent at each step.
+ * Runtime and stack space are both logarithmic in the exponent.
+ * Use a nonnegative base and exponent. Intermediate products must fit in long.
+ * Use the default modulus because the recursive call omits the mod argument.
+ */
 
-#include <bits/stdc++.h>
-using namespace std;
-
-long pow(long x, long n, long mod = 1e9+7) {
+long pow(long x, long n, long mod = 1'000'000'007L) {
     if (n == 0)
         return 1;
-    auto p = pow(x, n / 2);
+    long p = pow(x, n / 2);
     return p * p % mod * (n % 2 ? x : 1) % mod;
 }

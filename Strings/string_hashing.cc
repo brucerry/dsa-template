@@ -1,64 +1,67 @@
 /*
-    This code source:
-    https://github.com/ncduy0303/Competitive-Programming/blob/master/String%20Processing/String%20Hashing%20(Rabin-Karp).cpp
-*/
+ * Rabin–Karp counts occurrences of a nonempty pattern using rolling hashes.
+ * A random base and two moduli reduce the chance of collisions.
+ *
+ * Adapted from https://github.com/ncduy0303/Competitive-Programming/blob/master/String%20Processing/String%20Hashing%20(Rabin-Karp).cpp
+ * Example problem at https://cses.fi/problemset/task/1753
+ */
 
-// String Hashing 
-// Consider carefully the choice of 'base' and 'mod'
-// 'base' should be greater than the number of characters in the input alphabet 
-// 'mod' should be a large prime like 1e9 + 7
+#include <array>
+#include <chrono>
+#include <cstddef>
+#include <iterator>
+#include <random>
+#include <ranges>
+#include <string_view>
+#include <vector>
 
-// should always convert 'a' into 1 instead 0
-// should randomise the value of 'base' to avoid hacking
-// should use > 1 'base' to reduce collision rate
-
-// Example of string hashing (Rabin-Karp) to count the number of positions where the pattern occurs in the given string
-// Problem link: https://cses.fi/problemset/task/1753
-
-#include <bits/stdc++.h>
-using namespace std;
-
-mt19937 rng (chrono::steady_clock::now().time_since_epoch().count());
+std::mt19937 rng(static_cast<std::mt19937::result_type>(
+    std::chrono::steady_clock::now().time_since_epoch().count()));
 long long rand(long long l, long long r) {
-    return uniform_int_distribution(l, r)(rng);
+    return std::uniform_int_distribution(l, r)(rng);
 }
 
-const int BASE = rand(300, 1e9);
-const int NUM_MOD = 2;
-const long long MODS[] = {(int)1e9 + 2277, (int)1e9 + 5277};
+static long long BASE = rand(300, 1e9);
+constexpr int NUM_MOD = 2;
+constexpr std::array<long long, NUM_MOD> MODS{1'000'002'277, 1'000'005'277};
 
 struct Hash {
-    vector<long long> H[NUM_MOD], P[NUM_MOD];
-    Hash(string s) {
-        for (int i = 0; i < NUM_MOD; i++) {
-            P[i].push_back(1);
-            H[i].push_back(0);
-        }
-        for (char c : s) {
-            for (int i = 0; i < NUM_MOD; i++) {
-                P[i].push_back(P[i].back() * BASE % MODS[i]);
-                H[i].push_back((H[i].back() * BASE + c) % MODS[i]);
+    std::vector<long long> H[NUM_MOD], P[NUM_MOD];
+    Hash(std::string_view s) {
+        for (auto [hashes, powers, mod] : std::views::zip(H, P, MODS)) {
+            powers.push_back(1);
+            hashes.push_back(0);
+            for (char c : s) {
+                powers.push_back(powers.back() * BASE % mod);
+                hashes.push_back((hashes.back() * BASE + c) % mod);
             }
         }
-    } 
-    array<long long, NUM_MOD> operator()(int l, int r) {
-        array<long long, NUM_MOD> res;
-        for (int i = 0; i < NUM_MOD; i++) {
-            res[i] = (H[i][r + 1] - H[i][l] * P[i][r + 1 - l]) % MODS[i];
-            if (res[i] < 0)
-                res[i] += MODS[i];
+    }
+    std::array<long long, NUM_MOD> operator()(int l, int r) {
+        std::size_t start = static_cast<std::size_t>(l);
+        std::size_t end = static_cast<std::size_t>(r + 1);
+        std::array<long long, NUM_MOD> res;
+        for (auto [value, hashes, powers, mod] : std::views::zip(res, H, P, MODS)) {
+            value = (hashes[end] - hashes[start] * powers[end - start]) % mod;
+            if (value < 0)
+                value += mod;
         }
         return res;
     }
 };
 
-int count_occurs(string s, string pattern) {
-    int n = s.size();
-    int m = pattern.size();
+int count_occurs(std::string_view s, std::string_view pattern) {
+    int n = static_cast<int>(std::size(s));
+    int offset = static_cast<int>(std::size(pattern)) - 1;
+    if (offset >= n) {
+        return 0;
+    }
+
     Hash hs(s), ht(pattern);
+    std::array<long long, NUM_MOD> target = ht(0, offset);
     int res = 0;
-    for (int i = 0, j = m - 1; j < n; i++, j++) {
-        res += (hs(i, j) == ht(0, m - 1));
+    for (int end : std::views::iota(offset, n)) {
+        res += hs(end - offset, end) == target;
     }
     return res;
 }
